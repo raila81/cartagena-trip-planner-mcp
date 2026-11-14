@@ -1,0 +1,410 @@
+{
+  "author": "BRS Properties Co., Ltd. (cartagena.info)",
+  "cloudEndpoint": "https://cartagena.info/mcp?src=mcp",
+  "description": "Plan Cartagena, Colombia: heat-aware day plans, cruise days ashore, which island or beach fits, where to stay, official fees and taxi fares, transfers and sights.",
+  "homepage": "https://cartagena.info/ai-assistants/",
+  "identifier": "cartagena-trip-planner",
+  "name": "Cartagena Trip Planner",
+  "prompts": [],
+  "resources": [],
+  "tags": [
+    "travel",
+    "colombia",
+    "cartagena",
+    "caribbean",
+    "trip-planner"
+  ],
+  "tools": [
+    {
+      "name": "plan_cartagena_day",
+      "title": "Cartagena day planner",
+      "description": "Use this when someone wants a timed day in Cartagena, Colombia for a month or a date: a city day (the walled city early while the streets are cool, the hot hours indoors or in the shade, the city wall at sunset, dinner, Getsemaní at night) or an island day (one boat day, then dinner). Times come from the hourly heat of that month, sunset, sea state and museum hours; a date adds the cruise ships in port that day. Returns timed slots with what to do and why, the month's felt temperature, rain, sea and sunset, and shows a day card. Not for a day off a cruise ship (the hours ashore depend on the ship) and not for picking which island. Examples: \"Plan a day in Cartagena in March.\" / \"¿Qué hago un día en Cartagena en julio?\"",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12,
+            "description": "Month 1 to 12. Default: the current month in Cartagena."
+          },
+          "date": {
+            "type": "string",
+            "description": "Date as YYYY-MM-DD (or \"today\", \"tomorrow\"), 2026-01-01 to 2030-12-31. Sets the month and lists ships in port."
+          },
+          "day_type": {
+            "type": "string",
+            "enum": [
+              "city",
+              "island"
+            ],
+            "description": "city (default) or island."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "es",
+              "de",
+              "fr",
+              "it",
+              "pt",
+              "ru",
+              "nl"
+            ],
+            "description": "Language of the wording: en, es, de, fr, it, pt, ru, nl. Match the user; for any other language use en and translate. Facts, numbers and links are the same in every language."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "cruise_day_ashore",
+      "title": "Cartagena cruise day planner",
+      "description": "Use this when someone arrives in Cartagena, Colombia on a cruise ship for the day and wants to know what fits between arrival and all aboard: the fortress Castillo San Felipe only inside its cool windows, the walled-city loop while the streets are cool, lunch and the museums through the hot hours, the city wall at sunset, and the latest start back to the terminal. Give arrival and all-aboard times, or a ship and date from the 2026-27 schedule; taxi or walking in, and the buffers, can be changed. Returns every step with clock times, the hot steps marked with the felt temperature, and a one-line summary, and shows a timeline card. Not for a land stay of a day or more. Examples: \"Our ship docks in Cartagena at 8:00 and all aboard is 17:30. What can we do?\" / \"Llegamos en crucero a Cartagena a las 7:00, ¿nos da tiempo para el Castillo San Felipe?\"",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "arrival": {
+            "type": "string",
+            "description": "Ship arrival as HH:MM (24-hour). Default: the most common arrival of the season."
+          },
+          "all_aboard": {
+            "type": "string",
+            "description": "All-aboard time as HH:MM; after midnight, e.g. 00:30, counts as the next day. Default: from the ship, or the common call."
+          },
+          "month": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12,
+            "description": "Month 1 to 12. Default: the current month in Cartagena."
+          },
+          "date": {
+            "type": "string",
+            "description": "Date as YYYY-MM-DD (or \"today\", \"tomorrow\"), 2026-01-01 to 2030-12-31. With ship, picks that call; alone, lists the ships in port."
+          },
+          "ship": {
+            "type": "string",
+            "description": "Ship name from the 2026-27 schedule of single-day calls, e.g. \"MSC Seaview\". Needs date or month."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "taxi",
+              "walk"
+            ],
+            "description": "Into town by taxi (default) or on foot."
+          },
+          "ashore_min": {
+            "type": "integer",
+            "minimum": 15,
+            "maximum": 120,
+            "description": "Minutes to get off the ship and through the terminal (default 45)."
+          },
+          "taxi_min": {
+            "type": "integer",
+            "minimum": 10,
+            "maximum": 45,
+            "description": "Minutes for one taxi ride door to door (default 20)."
+          },
+          "back_min": {
+            "type": "integer",
+            "minimum": 15,
+            "maximum": 90,
+            "description": "Minutes to be back at the terminal before all aboard (default 30)."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "es",
+              "de",
+              "fr",
+              "it",
+              "pt",
+              "ru",
+              "nl"
+            ],
+            "description": "Language of the wording: en, es, de, fr, it, pt, ru, nl. Match the user; for any other language use en and translate. Facts, numbers and links are the same in every language."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "pick_cartagena_island",
+      "title": "Cartagena island picker",
+      "description": "Use this when someone asks which island or beach day near Cartagena, Colombia suits them: Tierra Bomba, Barú and Playa Blanca, Cholón, the Rosario Islands or the San Bernardo islands. It ranks the five groups by the time they have, what they want, how they feel about a fast boat on a choppy sea, how they want to spend, and the typical sea in their month. Returns each group with why it fits or not, the straight-line distance, boat or road time and the park and dock fees paid at the pier, and shows the ranking card. Not for a timed plan of the day and not for booking a boat. Examples: \"Which island near Cartagena is best for a half day with kids?\" / \"¿Islas del Rosario o Playa Blanca para un día de playa en enero?\"",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string",
+            "enum": [
+              "half",
+              "full",
+              "night"
+            ],
+            "description": "half (half a day), full (a full day), night (a night or more). Default full."
+          },
+          "want": {
+            "type": "string",
+            "enum": [
+              "swim",
+              "pool",
+              "party",
+              "quiet",
+              "kids"
+            ],
+            "description": "swim (swim and snorkel), pool (a pool and service), party (a party), quiet (quiet), kids (a day with children). Default swim."
+          },
+          "boat": {
+            "type": "string",
+            "enum": [
+              "fine",
+              "short",
+              "avoid"
+            ],
+            "description": "A fast boat on a choppy sea is: fine (fine), short (fine if it is short), avoid (something i would rather avoid). Default fine."
+          },
+          "budget": {
+            "type": "string",
+            "enum": [
+              "public",
+              "pass",
+              "private"
+            ],
+            "description": "public (public beach), pass (day pass or shared tour), private (private boat). Default pass."
+          },
+          "month": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12,
+            "description": "Month 1 to 12. Default: the current month in Cartagena."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "es",
+              "de",
+              "fr",
+              "it",
+              "pt",
+              "ru",
+              "nl"
+            ],
+            "description": "Language of the wording: en, es, de, fr, it, pt, ru, nl. Match the user; for any other language use en and translate. Facts, numbers and links are the same in every language."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "where_to_stay_in_cartagena",
+      "title": "Cartagena area chooser",
+      "description": "Use this when someone asks which neighbourhood of Cartagena, Colombia to stay in: Centro, San Diego, Getsemaní, El Cabrero, Marbella, Manga, Bocagrande, El Laguito, Castillogrande, Crespo or La Boquilla. Rank them by what matters: walk to the sights, a beach at the door, quiet at night, places with a pool, the lowest airport taxi. Returns every area with the walk to the Clock Tower gate in minutes, the distance to the nearest beach, the bars mapped in the barrio, the share of listed stays with a pool and the official airport taxi fare, and what fits or speaks against it. Not for naming or comparing hotels. Examples: \"Where should we stay in Cartagena to walk everywhere and have a pool?\" / \"¿En qué barrio de Cartagena me quedo si quiero playa y tranquilidad?\"",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "priorities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "walk",
+                "beach",
+                "quiet",
+                "pool",
+                "taxi"
+              ]
+            },
+            "maxItems": 5,
+            "description": "Any of walk (walk everywhere), beach (beach at the door), quiet (quiet at night), pool (a pool), taxi (lowest airport taxi). Empty: ordered by the walk to the sights."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "es",
+              "de",
+              "fr",
+              "it",
+              "pt",
+              "ru",
+              "nl"
+            ],
+            "description": "Language of the wording: en, es, de, fr, it, pt, ru, nl. Match the user; for any other language use en and translate. Facts, numbers and links are the same in every language."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "cartagena_month_guide",
+      "title": "Cartagena month by month",
+      "description": "Use this when someone asks what Cartagena, Colombia is like in a given month, or when to go: felt temperature at 8:00 and 13:00 and in the sea breeze, days with rain, the typical sea, sunrise and sunset, the hours when the streets, the city wall and the fortress are cool enough to walk, and how many days cruise ships are in port. One month in detail, or all twelve side by side. Not for a timed plan of a day. Examples: \"What is the weather like in Cartagena in October?\" / \"¿Cuál es la mejor época para ir a Cartagena?\"",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12,
+            "description": "Month 1 to 12. Omit for all twelve months."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "es",
+              "de",
+              "fr",
+              "it",
+              "pt",
+              "ru",
+              "nl"
+            ],
+            "description": "Language of the wording: en, es, de, fr, it, pt, ru, nl. Match the user; for any other language use en and translate. Facts, numbers and links are the same in every language."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "cartagena_costs",
+      "title": "Cartagena official fees and fares",
+      "description": "Use this when someone asks what things cost in Cartagena, Colombia: the official airport taxi fares by zone and the night surcharge, the airport and tourism taxes on tickets, the Transcaribe bus fare, entry to Castillo San Felipe, San Pedro Claver, the Palace of the Inquisition and the Aviario Nacional, the national park and dock fees for a boat day, the tip rule and VAT, plus the range listed for common tours, labelled as such. Amounts in Colombian pesos (COP) with the US dollar at the official exchange rate, or in USD where the source sets USD. Not for room rates or a full trip budget. Examples: \"How much is the taxi from Cartagena airport to the old town?\" / \"¿Cuánto cuesta la entrada al Castillo San Felipe?\"",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "enum": [
+              "all",
+              "arriving",
+              "getting_around",
+              "sites",
+              "islands",
+              "tips_and_taxes",
+              "airport_taxi",
+              "tours"
+            ],
+            "description": "all (default), arriving, getting_around, sites, islands, tips_and_taxes, airport_taxi (every zone of the airport table) or tours (listed tour ranges)."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "es",
+              "de",
+              "fr",
+              "it",
+              "pt",
+              "ru",
+              "nl"
+            ],
+            "description": "Language of the wording: en, es, de, fr, it, pt, ru, nl. Match the user; for any other language use en and translate. Facts, numbers and links are the same in every language."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "getting_to_and_around",
+      "title": "Getting to and around Cartagena",
+      "description": "Use this when someone asks how to get to Cartagena, Colombia or around it: direct flights into Cartagena (CTG) from a city or a region, the van, bus or car to Santa Marta, the ways from Medellín door to door, or whether to walk or ride between eight points in town (Clock Tower gate, Plaza de la Trinidad, Castillo San Felipe, Las Bóvedas, Muelle de la Bodeguita, Bocagrande, the cruise terminal, the airport) at a given hour and month. Returns airlines and seasons, door-to-door times by leg, or the walk in metres and minutes with a heat verdict and the taxi and bus fares. Not for booking transport. Examples: \"How do I get from Cartagena to Santa Marta?\" / \"¿Se puede ir caminando del centro histórico a Bocagrande?\"",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "trip": {
+            "type": "string",
+            "enum": [
+              "around_town",
+              "flights",
+              "santa_marta",
+              "medellin"
+            ],
+            "description": "around_town (needs from and to), flights (into CTG), santa_marta or medellin. Default: around_town when to is given, else flights."
+          },
+          "from": {
+            "type": "string",
+            "description": "around_town: start point. flights: a city, airport code or region (us east coast, us, canada, europe, latin america, colombia). Omit for every direct route."
+          },
+          "to": {
+            "type": "string",
+            "description": "around_town: end point (Clock Tower, Trinidad, Castillo San Felipe, Las Bóvedas, Bodeguita, Bocagrande, cruise terminal, airport)."
+          },
+          "month": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12,
+            "description": "Month 1 to 12. Default: the current month in Cartagena."
+          },
+          "time": {
+            "type": "string",
+            "description": "around_town: start time as HH:MM (default 10:00)."
+          },
+          "start": {
+            "type": "string",
+            "description": "santa_marta: walls (default), getsemani or bocagrande. medellin: poblado (default), laureles or centro."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "es",
+              "de",
+              "fr",
+              "it",
+              "pt",
+              "ru",
+              "nl"
+            ],
+            "description": "Language of the wording: en, es, de, fr, it, pt, ru, nl. Match the user; for any other language use en and translate. Facts, numbers and links are the same in every language."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "cartagena_place",
+      "title": "Cartagena place finder",
+      "description": "Use this when someone asks about one place in or near Cartagena, Colombia: what it is, how far it is from the Clock Tower gate in a straight line and on foot, and its official entry fees or hours where the guide prints them. Covers the squares, churches, museums, bastions and streets of the walled city and Getsemaní, Castillo San Felipe, La Popa, the neighbourhoods, beaches, docks, the airport and cruise terminal, the islands and the day-trip sights (Totumo, Palenque, the Aviario). Not for opening a full guide to the area. Examples: \"How far is Castillo San Felipe from the old town?\" / \"¿Qué es Las Bóvedas y dónde están?\"",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Place name in English or Spanish, e.g. \"Castillo San Felipe\", \"Las Bóvedas\", \"Playa Blanca\"."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "es",
+              "de",
+              "fr",
+              "it",
+              "pt",
+              "ru",
+              "nl"
+            ],
+            "description": "Language of the wording: en, es, de, fr, it, pt, ru, nl. Match the user; for any other language use en and translate. Facts, numbers and links are the same in every language."
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ]
+}

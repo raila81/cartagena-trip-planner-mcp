@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "cartagena-trip-planner": {
+      "type": "streamable-http",
+      "url": "https://cartagena.info/mcp?src=mcp"
+    }
+  }
+}

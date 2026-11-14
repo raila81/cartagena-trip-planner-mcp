@@ -1,0 +1,8 @@
+{
+  "name": "cartagena-trip-planner-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cartagena, Colombia trip planning tools for AI assistants (MCP): day plans, cruise days, islands, areas, months, fees, transport.",
+  "homepage": "https://cartagena.info/ai-assistants/",
+  "license": "MIT"
+}
