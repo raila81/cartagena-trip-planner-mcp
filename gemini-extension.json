@@ -1,0 +1,10 @@
+{
+  "name": "cartagena-trip-planner",
+  "version": "1.0.0",
+  "description": "Cartagena, Colombia trip planning tools for AI assistants (MCP): heat-aware day plans, cruise days ashore, islands and beaches, where to stay, official fees and taxi fares, transport",
+  "mcpServers": {
+    "cartagena-trip-planner": {
+      "httpUrl": "https://cartagena.info/mcp?src=mcp"
+    }
+  }
+}
